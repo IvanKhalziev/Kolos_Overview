@@ -1,4 +1,4 @@
-from .models import QuantityItemColorSize, Item, Category, GlobalCategory, Gender, Size, Color, Quantity
+from .models import QuantityItemColorSize, Item, Category, GlobalCategory, Gender, Size, Color, Collection
 from rest_framework import serializers
 
 
@@ -9,28 +9,38 @@ class ItemSerializer(serializers.ModelSerializer):
         slug_field='name', queryset=GlobalCategory.objects.all())
     gender = serializers.SlugRelatedField(
         slug_field='name', queryset=Gender.objects.all())
+    collection = serializers.SlugRelatedField(
+        slug_field='name', queryset=Collection.objects.all())
     sizes_color_quantity = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
-        fields = ('name', 'id', 'price', 'gender', 'global_category', 'category', 'description',
-                  'sizes_color_quantity')
+        fields = ('name', 'id', 'price', 'gender', 'global_category', 'category', 'collection', 'description',
+                  'sizes_color_quantity_photo')
 
-    def get_sizes_color_quantity(self, item):
-        sizes_colors = QuantityItemColorSize.objects.filter(item=item)
-        sizes_color_data = []
+    def get_sizes_color_quantity_photo(self, item):
+        sizes_colors_quantity_photos = QuantityItemColorSize.objects.filter(
+            item=item)
+        sizes_colors_quantity_photo_data = []
 
-        for size_color in sizes_colors:
-            sizes_color_data.append({
-                'id': size_color.id,
-                'size': size_color.size.name,
-                'color': size_color.color.name,
-                'hex': size_color.color.hex,
-                'quantity': size_color.quantity.quantity,
-                'photo_url': size_color.photo_url,
+        for sizes_colors_quantity_photo in sizes_colors_quantity_photos:
+            photos = sizes_colors_quantity_photo.photo_url
+            photo_urls = [
+                getattr(photos, f'photo_url_{i}', None) for i in range(1, 7)]
+
+            photo_url_dict = {f'photo_url_{i}': url for i,
+                              url in enumerate(photo_urls, 1)}
+
+            sizes_colors_quantity_photo_data.append({
+                'id': sizes_colors_quantity_photo.id,
+                'size': sizes_colors_quantity_photo.size.name,
+                'color': sizes_colors_quantity_photo.color.name,
+                'hex': sizes_colors_quantity_photo.color.hex,
+                'quantity': sizes_colors_quantity_photo.quantity.quantity,
+                'photo_urls': photo_url_dict,
             })
 
-        return sizes_color_data
+        return sizes_colors_quantity_photo_data
 
 
 class PatchQuantitySerializer(serializers.ModelSerializer):

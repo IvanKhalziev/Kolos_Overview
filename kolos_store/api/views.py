@@ -1,7 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
 
 from rest_framework.permissions import IsAuthenticated
+
 from rest_framework.pagination import PageNumberPagination
 
 from common.views import ReadOnlyMixin
@@ -10,8 +12,12 @@ from products.models import Item, QuantityItemColorSize
 from products.serializers import ItemSerializer, PatchQuantitySerializer
 
 
+class CustomPagination(PageNumberPagination):
+    page_size_query_param = 'amount_items'
+    max_page_size = 30
+
 class AllItemsView(APIView):
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPagination
 
     def get(self, request):
         items = Item.objects.all()
@@ -24,44 +30,41 @@ class AllItemsView(APIView):
         return paginator.get_paginated_response(item_serializer.data)
 
 
-class CustomPagination(PageNumberPagination):
-    page_size = 10
 
-
-class CasualItemView(ModelViewSet):
+class CasualItemView(ReadOnlyMixin, ModelViewSet):
     queryset = Item.objects.filter(global_category__name='Casual')
     serializer_class = ItemSerializer
     pagination_class = CustomPagination
 
 
-class ClassicItemView(ModelViewSet):
+class ClassicItemView(ReadOnlyMixin, ModelViewSet):
     queryset = Item.objects.filter(global_category__name='Classic')
     serializer_class = ItemSerializer
     pagination_class = CustomPagination
 
 
-class MaleClassicItemView(ModelViewSet):
+class MaleClassicItemView(ReadOnlyMixin, ModelViewSet):
     queryset = Item.objects.filter(
         gender__name='Male', global_category__name='Classic')
     serializer_class = ItemSerializer
     pagination_class = CustomPagination
 
 
-class FemaleClassicItemView(ModelViewSet):
+class FemaleClassicItemView(ReadOnlyMixin, ModelViewSet):
     queryset = Item.objects.filter(
         gender__name='Female', global_category__name='Classic')
     serializer_class = ItemSerializer
     pagination_class = CustomPagination
 
 
-class MaleCasualItemView(ModelViewSet):
+class MaleCasualItemView(ReadOnlyMixin, ModelViewSet):
     queryset = Item.objects.filter(
         gender__name='Male', global_category__name='Casual')
     serializer_class = ItemSerializer
     pagination_class = CustomPagination
 
 
-class FemaleCasualItemView(ModelViewSet):
+class FemaleCasualItemView(ReadOnlyMixin, ModelViewSet):
     queryset = Item.objects.filter(
         gender__name='Female', global_category__name='Casual')
     serializer_class = ItemSerializer

@@ -86,9 +86,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'KolosDB',
-        'USER': 'postgres',
+        'USER': '///',
         'PASSWORD': '///',
-        'HOST': 'localhost',
+        'HOST': '///',
         'PORT': '///'
     }
 }
@@ -152,9 +152,22 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-# Global Pagination
+# Pagination
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 4,
 }
+
+# Corsa fix
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    "Authorization",
+    "Content-Type",
+]
+
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:8000/",
+    "https://kolos-company.vercel.app/",
+]
