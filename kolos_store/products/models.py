@@ -9,15 +9,17 @@ class GlobalCategory(models.Model):
         return self.name
 
 
-class Category(models.Model):
+class Gender(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
 
 
-class Gender(models.Model):
+class Category(models.Model):
     name = models.CharField(max_length=255)
+    gender = models.ManyToManyField(
+        Gender, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -44,8 +46,11 @@ class Size(models.Model):
     def __str__(self):
         return self.name
 
+
 class Collection(models.Model):
     name = models.CharField(max_length=55, null=True, blank=True)
+    description = models.CharField(max_length=250, null=True, blank=True)
+    photo_url = models.CharField(max_length=120, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -82,6 +87,7 @@ class Item(models.Model):
 
 
 class QuantityItemColorSize(models.Model):
+    discount = models.IntegerField(null=True)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     size = models.ForeignKey(Size, on_delete=models.CASCADE)
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
@@ -90,4 +96,4 @@ class QuantityItemColorSize(models.Model):
         Photo_URL, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.item.name} | {self.size.name} | {self.color.name} | {self.color.hex} | {self.quantity.quantity}"
+        return f"{self.item.name} | {self.size.name} | {self.color.name} | {self.color.hex} | {self.quantity.quantity} | {self.discount} %"

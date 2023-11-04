@@ -16,9 +16,9 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ('name', 'id', 'price', 'gender', 'global_category', 'category', 'collection', 'description',
-                  'sizes_color_quantity_photo')
+                  'sizes_color_quantity')
 
-    def get_sizes_color_quantity_photo(self, item):
+    def get_sizes_color_quantity(self, item):
         sizes_colors_quantity_photos = QuantityItemColorSize.objects.filter(
             item=item)
         sizes_colors_quantity_photo_data = []
@@ -28,19 +28,35 @@ class ItemSerializer(serializers.ModelSerializer):
             photo_urls = [
                 getattr(photos, f'photo_url_{i}', None) for i in range(1, 7)]
 
-            photo_url_dict = {f'photo_url_{i}': url for i,
-                              url in enumerate(photo_urls, 1)}
-
             sizes_colors_quantity_photo_data.append({
                 'id': sizes_colors_quantity_photo.id,
+                'discount': sizes_colors_quantity_photo.discount,
                 'size': sizes_colors_quantity_photo.size.name,
                 'color': sizes_colors_quantity_photo.color.name,
                 'hex': sizes_colors_quantity_photo.color.hex,
                 'quantity': sizes_colors_quantity_photo.quantity.quantity,
-                'photo_urls': photo_url_dict,
+                'photo_urls': photo_urls,
             })
 
         return sizes_colors_quantity_photo_data
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    gender = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'gender')
+
+    def get_gender(self, gender):
+        return [gender.name for gender in gender.gender.all()]
+
+
+class CollectionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Collection
+        fields = ('id', 'name', 'description', 'photo_url')
 
 
 class PatchQuantitySerializer(serializers.ModelSerializer):
