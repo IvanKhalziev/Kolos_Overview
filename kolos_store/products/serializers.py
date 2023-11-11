@@ -13,10 +13,19 @@ class ItemSerializer(serializers.ModelSerializer):
         slug_field='name', queryset=Collection.objects.all())
     sizes_color_quantity = serializers.SerializerMethodField()
 
+    max_price = serializers.SerializerMethodField()
+    min_price = serializers.SerializerMethodField()
+
     class Meta:
         model = Item
-        fields = ('name', 'id', 'price', 'gender', 'global_category', 'category', 'collection', 'description',
+        fields = ('max_price', 'min_price', 'name', 'id', 'price', 'gender', 'global_category', 'category', 'collection', 'description',
                   'sizes_color_quantity')
+
+    def get_max_price(self, instance):
+        return self.context.get('request').max_price
+
+    def get_min_price(self, instance):
+        return self.context.get('request').min_price
 
     def get_sizes_color_quantity(self, item):
         sizes_colors_quantity_photos = QuantityItemColorSize.objects.filter(
@@ -38,6 +47,11 @@ class ItemSerializer(serializers.ModelSerializer):
                 'photo_urls': photo_urls,
             })
 
+        sizes_order = self.context['request'].query_params.getlist('size', [])
+
+        sizes_colors_quantity_photo_data.sort(key=lambda x: sizes_order.index(
+            x['size']) if x['size'] in sizes_order else len(sizes_order))
+
         return sizes_colors_quantity_photo_data
 
 
@@ -57,6 +71,21 @@ class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
         fields = ('id', 'name', 'description', 'photo_url')
+
+
+class CategoryCollectionSerializer(serializers.Serializer):
+    def to_representation(self, instance):
+        categories_data = Category.objects.all()
+        collections_data = Collection.objects.all()
+
+        category_serializer = CategorySerializer(categories_data, many=True)
+        collection_serializer = CollectionSerializer(
+            collections_data, many=True)
+
+        return {
+            'categories': category_serializer.data,
+            'collections': collection_serializer.data
+        }
 
 
 class PatchQuantitySerializer(serializers.ModelSerializer):

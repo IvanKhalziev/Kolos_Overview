@@ -3,6 +3,7 @@ from .views import PatchItemView, CollectionView, CategoryView
 
 from rest_framework import routers
 from django.urls import include, path
+from .views import CategoryCollectionView
 
 app_name = 'api'
 
@@ -48,4 +49,6 @@ urlpatterns = [
 
     path('collection/', include(collection_router.urls)),
     path('category/', include(category_router.urls)),
+    path('category-collection/',
+         CategoryCollectionView.as_view(), name='category-collection'),
 ]
