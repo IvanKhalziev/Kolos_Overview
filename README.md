@@ -2,9 +2,11 @@
 ## This is my Django REST API project, currently in development. Overview Repo
 
 ### Project Status
-1. Products: I've built the API for managing products.
+1. Products: I've built the API for managing products. (app products: models.py, serializers.py, admin.py)
 
-2. API Setup: The core API structure and settings are ready.
+2. API Setup: The core API structure and settings are ready. (app api: urls.py, utils.py, views.py)
+
+3. Sort items. (app common: views.py)
 
 ### Upcoming Work
 I'm currently working on:
